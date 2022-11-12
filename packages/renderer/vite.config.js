@@ -17,6 +17,7 @@ const config = {
   resolve: {
     alias: {
       '/@/': join(PACKAGE_ROOT, 'src') + '/',
+      'node:buffer': 'buffer',
     },
   },
   base: '',
@@ -45,6 +46,10 @@ const config = {
       preloadEntry: join(PACKAGE_ROOT, '../preload/src/index.ts'),
     }),
   ],
+  define: {
+    global: {},
+    'global.Uint8Array': 'Uint8Array',
+  },
 };
 
 export default config;

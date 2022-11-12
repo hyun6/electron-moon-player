@@ -62,7 +62,7 @@ export class HtmlPlaybackModule implements IPlaybackModule {
     // this._playbackModule.src = localPath;
 
     // TODO: local file check
-    const filePath = sourceUrl; //= convertFileSrc(sourceUrl);
+    const filePath = 'https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3'; //= convertFileSrc(sourceUrl);
     this._playbackModule.src = filePath;
 
     logger('open src: ', this._playbackModule.src);
@@ -72,9 +72,11 @@ export class HtmlPlaybackModule implements IPlaybackModule {
 
   play(msPosition?: number | undefined): void {
     logger('play');
+
     if (msPosition) {
       this.seek(msPosition);
     }
+    this._playbackModule.src = 'https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3';
     this._playbackModule.play();
   }
 

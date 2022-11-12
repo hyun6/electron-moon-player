@@ -1,4 +1,5 @@
 import type { ChangeEvent } from 'react';
+import { useEffect, useRef } from 'react';
 import React, { useState } from 'react';
 import { PlayArrow, PlaylistAdd } from '@mui/icons-material';
 import type { TrackId, TrackModel } from '../feature/track/track.model';
@@ -53,8 +54,69 @@ function Track({
 }
 
 export function PlaylistPage() {
+  const refPlaylist = useRef<HTMLDivElement>(null);
+
   const playlistState = usePlaylistState();
   const [checkedItems, setCheckedItems] = useState(new Set<TrackId>());
+
+  const handleDragEvent = (e: DragEvent) => {
+    console.log('drag');
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  useEffect(() => {
+    console.log('init drag & drop event');
+    const handleDropFile = async (e: DragEvent) => {
+      console.log('drop');
+      e.preventDefault();
+      e.stopPropagation();
+
+      const files = e.dataTransfer?.files;
+      console.log(files);
+      if (files === undefined) return;
+
+      /**
+       * 오디오 파일만 필터링해서 플레이리스트에 추가 시킨다
+       *  - FileList가 배열이 아니라 아래와 같은 정의를 갖기 때문에 array, iterator 방식 순회 불가해 for loop 방식 사용
+       * interface FileList {
+          readonly length: number;
+          item(index: number): File | null;
+          [index: number]: File;
+        }
+       */
+      const localFiles: File[] = [];
+      for (let i = 0; i < files.length; i += 1) {
+        const file = files[i];
+        const isAudioFile = file.type.includes('audio');
+        if (isAudioFile) {
+          console.log(file);
+          localFiles.push(file);
+        }
+      }
+      await playlistService.addLocalFileList(localFiles);
+    };
+
+    const ref = refPlaylist.current;
+
+    const initDragEvents = () => {
+      ref?.addEventListener('dragenter', handleDragEvent);
+      ref?.addEventListener('dragleave', handleDragEvent);
+      ref?.addEventListener('dragover', handleDragEvent);
+      ref?.addEventListener('drop', handleDropFile);
+    };
+
+    const removeDragEvents = () => {
+      ref?.removeEventListener('dragenter', handleDragEvent);
+      ref?.removeEventListener('dragleave', handleDragEvent);
+      ref?.removeEventListener('dragover', handleDragEvent);
+      ref?.removeEventListener('drop', handleDropFile);
+    };
+
+    initDragEvents();
+
+    return () => removeDragEvents();
+  }, []);
 
   const handleItemChecked = (id: TrackId, isChecked: boolean) => {
     if (isChecked) {
@@ -74,7 +136,7 @@ export function PlaylistPage() {
   };
 
   return (
-    <Box>
+    <Box ref={refPlaylist}>
       <div>PlaylistPage</div>
       <div>
         <button

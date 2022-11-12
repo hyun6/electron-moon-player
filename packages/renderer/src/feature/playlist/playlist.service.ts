@@ -1,8 +1,7 @@
-//import { tauriListener } from '../../tauri/listener';
 import { newTrack } from '../track/track.func';
 import type { TrackModel } from '../track/track.model';
-//import { trackMappingFromAudioMetadata } from '../utils/mapper';
-//import { parseMetadataFromFile } from '../utils/parseMetadata';
+import { trackMappingFromAudioMetadata } from '../utils/mapper';
+import { parseMetadataFromFile } from '../utils/parseMetadata';
 import { playlistStore } from './playlist.store';
 
 class PlaylistService {
@@ -14,13 +13,14 @@ class PlaylistService {
     playlistStore.trackList.push(track);
   }
 
-  async addLocalFileList(filePaths: string[]) {
-    for (const filePath of filePaths) {
-      const metadata = {}; //= await parseMetadataFromFile(filePath);
+  async addLocalFileList(fileList: File[]) {
+    for (const file of fileList) {
+      const metadata = await parseMetadataFromFile(file);
       if (metadata) {
-        const track = newTrack({ source: filePath });
-        // trackMappingFromAudioMetadata(track, metadata);
-        this.add(track);
+        console.log(file);
+        const track = newTrack({ source: file.webkitRelativePath ?? (file as any)?.path });
+        const trackWithMeta = trackMappingFromAudioMetadata(track, metadata);
+        this.add(trackWithMeta);
       }
     }
   }

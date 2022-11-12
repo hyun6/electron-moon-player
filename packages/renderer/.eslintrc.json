@@ -3,15 +3,13 @@
     "browser": true,
     "node": false
   },
-  "extends": ["plugin:react/recommended"],
+  "extends": ["../../.eslintrc.json", "plugin:react/recommended"],
+  "plugins": ["react"],
   "parserOptions": {
     "parser": "@typescript-eslint/parser",
     "ecmaVersion": 12,
-    "sourceType": "module"
+    "sourceType": "module",
+    "ecmaFeatures": { "jsx": true }
   },
-  "rules": {
-    /** These rules are disabled because they are incompatible with prettier */
-    "vue/html-self-closing": "off",
-    "vue/singleline-html-element-content-newline": "off"
-  }
+  "rules": {}
 }

@@ -1,6 +1,6 @@
-import {app, BrowserWindow} from 'electron';
-import {join} from 'path';
-import {URL} from 'url';
+import { app, BrowserWindow } from 'electron';
+import { join } from 'path';
+import { URL } from 'url';
 
 async function createWindow() {
   const browserWindow = new BrowserWindow({
@@ -40,6 +40,7 @@ async function createWindow() {
       ? import.meta.env.VITE_DEV_SERVER_URL
       : new URL('../renderer/dist/index.html', 'file://' + __dirname).toString();
 
+  console.log('load: ', pageUrl);
   await browserWindow.loadURL(pageUrl);
 
   return browserWindow;

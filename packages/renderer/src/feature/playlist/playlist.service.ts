@@ -3,6 +3,7 @@ import type { TrackModel } from '../track/track.model';
 import { trackMappingFromAudioMetadata } from '../utils/mapper';
 import { parseMetadataFromFile } from '../utils/parseMetadata';
 import { playlistStore } from './playlist.store';
+import { LOCAL_FILE_PROTOCOL_NAME } from '#preload';
 
 class PlaylistService {
   constructor() {
@@ -10,6 +11,7 @@ class PlaylistService {
   }
 
   add(track: TrackModel) {
+    console.log('add: ', track);
     playlistStore.trackList.push(track);
   }
 
@@ -17,8 +19,10 @@ class PlaylistService {
     for (const file of fileList) {
       const metadata = await parseMetadataFromFile(file);
       if (metadata) {
-        console.log(file);
-        const track = newTrack({ source: file.webkitRelativePath ?? (file as any)?.path });
+        const filePath = (file as any)?.path;
+        console.log('file: ', file);
+        console.log('source: ', filePath);
+        const track = newTrack({ source: `${LOCAL_FILE_PROTOCOL_NAME}://${filePath}` });
         const trackWithMeta = trackMappingFromAudioMetadata(track, metadata);
         this.add(trackWithMeta);
       }

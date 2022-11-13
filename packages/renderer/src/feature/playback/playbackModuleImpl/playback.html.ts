@@ -57,13 +57,8 @@ export class HtmlPlaybackModule implements IPlaybackModule {
   }
 
   async open(sourceUrl: string): Promise<boolean> {
-    logger('open: ', sourceUrl);
-    // const localPath = `C:/Users/kakaoent/Documents/멜론 보관함/받은 파일함/Officialdism-01-Mixed Nuts.mp3`;
-    // this._playbackModule.src = localPath;
-
-    // TODO: local file check
-    const filePath = 'https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3'; //= convertFileSrc(sourceUrl);
-    this._playbackModule.src = filePath;
+    // TODO: local file exist check, if sourceUrl has ${LOCAL_FILE_PROTOCOL_NAME}
+    this._playbackModule.src = sourceUrl;
 
     logger('open src: ', this._playbackModule.src);
     this._playbackModule.load();
@@ -72,11 +67,9 @@ export class HtmlPlaybackModule implements IPlaybackModule {
 
   play(msPosition?: number | undefined): void {
     logger('play');
-
     if (msPosition) {
       this.seek(msPosition);
     }
-    this._playbackModule.src = 'https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3';
     this._playbackModule.play();
   }
 

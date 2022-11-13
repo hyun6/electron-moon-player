@@ -1,4 +1,5 @@
 import { app } from 'electron';
+import { initProtocol } from './protocol';
 import './security-restrictions';
 import { restoreOrCreateWindow } from '/@/mainWindow';
 
@@ -36,6 +37,7 @@ app.on('activate', restoreOrCreateWindow);
  */
 app
   .whenReady()
+  .then(initProtocol) // window 생성 전에 프로토콜 등록 필요
   .then(restoreOrCreateWindow)
   .catch(e => console.error('Failed create window:', e));
 

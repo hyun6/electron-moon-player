@@ -15,6 +15,7 @@ import MelonImg from '../../assets/melon.png';
 
 import { usePlaybackState } from '../feature/playback/playback.store';
 import { playbackService } from '../feature/playback/playback.service';
+import { useEffect } from 'react';
 
 const Widget = styled('div')(({ theme }) => ({
   padding: 16,
@@ -54,7 +55,7 @@ export default function PlaybackPage() {
   const theme = useTheme();
   const duration = playbackStateSnapshot.durationTime; // seconds
   const position = playbackStateSnapshot.currentTime;
-  const volume = playbackStateSnapshot.volume;
+  const volumePercentage = playbackStateSnapshot.volumePercentage;
   const playingTrack = playbackStateSnapshot.playingTrack;
 
   function formatDuration(value: number) {
@@ -66,6 +67,10 @@ export default function PlaybackPage() {
   const mainIconColor = theme.palette.mode === 'dark' ? '#fff' : '#000';
   const lightIconColor =
     theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
+
+  useEffect(() => {
+    playbackService.volume(volumePercentage);
+  }, []);
 
   return (
     <Box sx={{ width: '100%', overflow: 'hidden' }}>
@@ -198,7 +203,7 @@ export default function PlaybackPage() {
           <VolumeDownRounded htmlColor={lightIconColor} />
           <Slider
             aria-label="Volume"
-            defaultValue={volume}
+            defaultValue={volumePercentage}
             min={0}
             max={100}
             onChange={(_, value) => playbackService.volume(value as number)}

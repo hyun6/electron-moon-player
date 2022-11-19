@@ -1,8 +1,7 @@
 import type { IPlaybackModule } from './playback.interface';
 import { HtmlPlaybackModule } from './playbackModuleImpl/playback.html';
-import type { TrackId } from '../track/track.model';
+import type { TrackId, TrackModel } from '../track/track.model';
 import { selectTrackById } from '../playlist/playlist.store';
-import { playbackStore } from './playback.store';
 import type { DebouncedFunc } from 'lodash';
 import _ from 'lodash';
 
@@ -11,6 +10,7 @@ import _ from 'lodash';
 // - https://github.com/pmndrs/valtio/wiki/How-to-organize-actions
 class PlaybackService {
   private _playbackModule: IPlaybackModule;
+  private _playingTrack?: TrackModel;
   private _volumeThrottleFunc: DebouncedFunc<(percentage: number) => void>;
 
   constructor(playbackModule: IPlaybackModule) {
@@ -21,6 +21,10 @@ class PlaybackService {
     }, 100);
   }
 
+  getPlayingTrack(): TrackModel | undefined {
+    return this._playingTrack;
+  }
+
   async open(trackId: TrackId): Promise<boolean> {
     const track = selectTrackById(trackId);
     if (track?.source === undefined) {
@@ -28,13 +32,15 @@ class PlaybackService {
     }
     const ok = await this._playbackModule.open(track.source);
     if (ok) {
-      playbackStore.playingTrack = track;
+      this._playingTrack = track;
     }
     return ok;
   }
 
-  play(msPosition?: number): void {
-    this._playbackModule.play(msPosition);
+  play(secPosition?: number): void {
+    if (this._playingTrack) {
+      this._playbackModule.play(secPosition);
+    }
   }
 
   pause(): void {
@@ -47,10 +53,11 @@ class PlaybackService {
 
   close(): void {
     this._playbackModule.close();
+    this._playingTrack = undefined;
   }
 
-  seek(msPosition: number): void {
-    this._playbackModule.seek(msPosition);
+  seek(secPosition: number): void {
+    this._playbackModule.seek(secPosition);
   }
 
   volume(percentage: number): void {

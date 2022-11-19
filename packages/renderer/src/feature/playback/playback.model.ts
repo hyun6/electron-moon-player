@@ -25,7 +25,7 @@ export interface PlaybackStore {
   playingTrack?: TrackModel;
   isPlaying: boolean;
   isShuffle: boolean;
-  currentTime: number;
-  durationTime: number;
-  volume: number; // 0~100
+  currentTime: number; // sec
+  durationTime: number; // sec
+  volumePercentage: number; // 0~100
 }

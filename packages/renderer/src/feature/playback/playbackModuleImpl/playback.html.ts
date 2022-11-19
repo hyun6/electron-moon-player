@@ -11,6 +11,7 @@ export class HtmlPlaybackModule implements IPlaybackModule {
     this._initPlaybackEventListener();
   }
 
+  // TODO: for multiple playback module, state changed handler logic is hold by playbackStore
   private _initPlaybackEventListener(): void {
     this._playbackModule.addEventListener('timeupdate', () => {
       logger('event:timeupdate');
@@ -20,25 +21,21 @@ export class HtmlPlaybackModule implements IPlaybackModule {
     this._playbackModule.addEventListener('canplay', () => {
       logger('event:canplay');
       playbackStore.status = PlaybackModuleStatus.Prepared;
-      playbackStore.durationTime = this._playbackModule.duration;
     });
 
     this._playbackModule.addEventListener('play', () => {
       logger('event:play');
       playbackStore.status = PlaybackModuleStatus.Started;
-      playbackStore.isPlaying = true;
     });
 
     this._playbackModule.addEventListener('pause', () => {
       logger('event:pause');
       playbackStore.status = PlaybackModuleStatus.Paused;
-      playbackStore.isPlaying = false;
     });
 
     this._playbackModule.addEventListener('ended', () => {
       logger('event:ended');
       playbackStore.status = PlaybackModuleStatus.End;
-      playbackStore.isPlaying = false;
     });
 
     this._playbackModule.addEventListener('volumechange', () => {
@@ -46,11 +43,6 @@ export class HtmlPlaybackModule implements IPlaybackModule {
     });
 
     this._playbackModule.addEventListener('durationchange', () => {
-      logger('event:durationChange');
-      playbackStore.durationTime = this._playbackModule.duration;
-    });
-
-    this._playbackModule.addEventListener('currentTime', () => {
       logger('event:durationChange');
       playbackStore.durationTime = this._playbackModule.duration;
     });
@@ -65,10 +57,10 @@ export class HtmlPlaybackModule implements IPlaybackModule {
     return true;
   }
 
-  play(msPosition?: number | undefined): void {
+  play(secPosition?: number | undefined): void {
     logger('play');
-    if (msPosition) {
-      this.seek(msPosition);
+    if (secPosition) {
+      this.seek(secPosition);
     }
     this._playbackModule.play();
   }
@@ -88,17 +80,18 @@ export class HtmlPlaybackModule implements IPlaybackModule {
     this._playbackModule.src = '';
   }
 
-  seek(msPosition: number): void {
-    logger('seek: ', msPosition);
-    // this._playbackModule.fastSeek(msPosition);
-    this._playbackModule.currentTime = msPosition;
+  seek(secPosition: number): void {
+    logger('seek: ', secPosition);
+    this._playbackModule.currentTime = secPosition;
   }
 
   volume(percentage: number): void {
     // - https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/volume
     // - 0 ~ 1 범위로 설정
-    this._playbackModule.volume = percentage / 100;
+    // - in macos 0.1 volume is so loud, so change range range 0~1 to 0~0.1
+    this._playbackModule.volume = percentage / 1000;
     this._playbackModule.muted = percentage === 0;
+    logger('volume: ', this._playbackModule.volume);
   }
 
   mute(): void {

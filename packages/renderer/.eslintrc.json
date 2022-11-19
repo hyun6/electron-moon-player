@@ -3,7 +3,7 @@
     "browser": true,
     "node": false
   },
-  "extends": ["../../.eslintrc.json", "plugin:react/recommended"],
+  "extends": ["../../.eslintrc.json", "plugin:react/recommended", "plugin:valtio/recommended"],
   "plugins": ["react"],
   "parserOptions": {
     "parser": "@typescript-eslint/parser",
